@@ -1,10 +1,10 @@
 # Local Setup
 
-`$ git clone https://github.com/Makflay/App-Calculator.git`
+`1. $ git clone https://github.com/Makflay/App-Calculator.git`
 
-`$ cd App-Calculator`
+`2. $ cd App-Calculator`
 
-`$ npm install`
+`3. $ npm install`
 
 # Run Locally
 
