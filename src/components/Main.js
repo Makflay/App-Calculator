@@ -18,7 +18,7 @@ class Main extends Component {
     componentDidMount() {
         this.timerID = setTimeout(
             () => this.updatePre(),
-            4000
+            6000
         );
     }
 
@@ -31,7 +31,7 @@ class Main extends Component {
         if(this.state.update === false) {
             console.log('оставляем старые данные');
         } else {
-            if(isFinite(PreMath(this.state.preResult, this.state.totalResult))) {
+            if(isFinite(PreMath(this.state.preResult, this.state.totalResult)) || PreMath(this.state.preResult, this.state.totalResult) !== NaN) {
                 this.setState({preResult: PreMath(this.state.preResult, this.state.totalResult), update: false})
             } else {
                 alert('Ошибка! Ввод некорректных данных');
@@ -109,14 +109,23 @@ class Main extends Component {
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать вычисление!');
                 } else {
-                    this.setState({
-                    //totalResult: PreMath(this.state.preResult, this.state.totalResult),
-                        totalResult: this.state.preResult,
-                        preResult: "",
-                        update: false,
-                        haveResult: true
-                    })
+                    if(isFinite(PreMath('', this.state.totalResult)) && PreMath('', this.state.totalResult) !== NaN && isFinite(PreMath(this.state.preResult, this.state.totalResult)) && PreMath(this.state.preResult, this.state.totalResult) !== NaN) {
+                        console.log(PreMath(this.state.preResult, this.state.totalResult) === NaN);
+                        console.log('if work!')
+                        this.setState({totalResult: PreMath('', this.state.totalResult), update: false, haveResult: true, preResult: ""})
+                    } else {
+                        alert('Ошибка! Ввод некорректных данных');
+                        this.setState({preResult: "", totalResult: "", update: false})
+                    }
                 }
+                //     this.setState({
+                //     //totalResult: PreMath(this.state.preResult, this.state.totalResult),
+                //         totalResult: this.state.preResult,
+                //         preResult: "",
+                //         update: false,
+                //         haveResult: true
+                //     })
+                // }
                 break;
             case "-":
                 this.setState({totalResult: this.state.totalResult + action, haveResult: false })
