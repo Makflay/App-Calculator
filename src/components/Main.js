@@ -9,46 +9,30 @@ class Main extends Component {
         this.state = {
             totalResult: "",
             preResult: "",
-            update: false,
-            haveResult: false
+            haveResult: false,
+            haveOperator: false
         }
         this.onEvent = this.onEvent.bind(this);
     }
 
-    componentDidMount() {
-        this.timerID = setTimeout(
-            () => this.updatePre(),
-            6000
-        );
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-
     updatePre() {
-        console.log(this.state.update)
-        if(this.state.update === false) {
-            console.log('оставляем старые данные');
+        if(isFinite(PreMath(this.state.totalResult))) {
+            this.setState({preResult: PreMath(this.state.totalResult)})
         } else {
-            if(isFinite(PreMath(this.state.preResult, this.state.totalResult)) || PreMath(this.state.preResult, this.state.totalResult) !== NaN) {
-                this.setState({preResult: PreMath(this.state.preResult, this.state.totalResult), update: false})
-            } else {
-                alert('Ошибка! Ввод некорректных данных');
-                this.setState({preResult: "", totalResult: "", update: false})
-            }
+            alert('Ошибка! Ввод некорректных данных');
+            this.setState({preResult: "", totalResult: ""})
         }
     }
 
     onEvent = (action) => {
-        console.log(action);
+        //console.log(action);
         switch (action) {
             case "all_clear":
                 this.setState({
                     totalResult: "",
                     preResult: "",
-                    update: false,
-                    haveResult: false
+                    haveResult: false,
+                    haveOperator: false
                 })
                 break;
             case "del_symbol":
@@ -63,44 +47,59 @@ class Main extends Component {
             case "%":
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать вычисление процента!');
+                } else if(this.state.preResult === '') {
+                    alert('Перед вычесление процента необходимо добавить оператор.')
                 } else {
                     this.setState({
                         totalResult: this.state.totalResult + action,
-                        update: false,
-                        haveResult: false
+                        haveResult: false,
+                    }, () => {
+                        this.updatePre();
                     })
                 }
                 break;
             case "/":
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать деление!');
+                } else if(this.state.haveOperator === true) {
+                    alert('Оператор уже добавлен! Сделаейте выражение, чтобы начать работу с другим оператором.')
+                } else if(this.state.preResult !== '') {
+                    this.setState({totalResult: this.state.preResult + action})
                 } else {
                     this.setState({
                         totalResult: this.state.totalResult + action,
-                        update: false,
-                        haveResult: false
+                        haveResult: false,
+                        haveOperator: true
                     })
                 }
                 break;
             case "*":
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать умножение!');
+                } else if(this.state.haveOperator === true) {
+                    alert('Оператор уже добавлен! Сделаейте выражение, чтобы начать работу с другим оператором.')
+                } else if(this.state.preResult !== '') {
+                    this.setState({totalResult: this.state.preResult + action})
                 } else {
                     this.setState({
                         totalResult: this.state.totalResult + action,
-                        update: false,
-                        haveResult: false
+                        haveResult: false,
+                        haveOperator: true
                     })
                 }
                 break;
             case "+":
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать сложение!');
+                } else if(this.state.haveOperator === true) {
+                    alert('Оператор уже добавлен! Сделаейте выражение, чтобы начать работу с другим оператором.')
+                } else if(this.state.preResult !== '') {
+                    this.setState({totalResult: this.state.preResult + action})
                 } else {
                     this.setState({
                         totalResult: this.state.totalResult + action,
-                        update: false,
-                        haveResult: false
+                        haveResult: false,
+                        haveOperator: true
                     })
                 }
                 break;
@@ -108,27 +107,24 @@ class Main extends Component {
             case "Enter":
                 if(this.state.totalResult.length === 0 || this.state.totalResult === "-") {
                     alert('Вы не добавили цифру, чтобы использовать вычисление!');
-                } else {
-                    if(isFinite(PreMath('', this.state.totalResult)) && PreMath('', this.state.totalResult) !== NaN && isFinite(PreMath(this.state.preResult, this.state.totalResult)) && PreMath(this.state.preResult, this.state.totalResult) !== NaN) {
-                        console.log(PreMath(this.state.preResult, this.state.totalResult) === NaN);
-                        console.log('if work!')
-                        this.setState({totalResult: PreMath('', this.state.totalResult), update: false, haveResult: true, preResult: ""})
-                    } else {
-                        alert('Ошибка! Ввод некорректных данных');
-                        this.setState({preResult: "", totalResult: "", update: false})
-                    }
+                }  else {
+                    this.setState({
+                    //totalResult: PreMath(this.state.preResult, this.state.totalResult),
+                        totalResult: this.state.preResult,
+                        preResult: "",
+                        haveResult: true,
+                        haveOperator: false
+                    })
                 }
-                //     this.setState({
-                //     //totalResult: PreMath(this.state.preResult, this.state.totalResult),
-                //         totalResult: this.state.preResult,
-                //         preResult: "",
-                //         update: false,
-                //         haveResult: true
-                //     })
-                // }
                 break;
             case "-":
-                this.setState({totalResult: this.state.totalResult + action, haveResult: false })
+                if(this.state.haveOperator === true) {
+                    alert('Оператор уже добавлен! Сделаейте выражение, чтобы начать работу с другим оператором.')
+                } else if(this.state.preResult !== '') {
+                    this.setState({totalResult: this.state.preResult + action})
+                } else {
+                    this.setState({totalResult: this.state.totalResult + action, haveResult: false, haveOperator: true })
+                }
                 break;
             case ".":
             case "0":
@@ -146,11 +142,14 @@ class Main extends Component {
                         totalResult: "",
                         preResult: "",
                     }, () => {
-                        this.setState({totalResult: this.state.totalResult + action, haveResult: false })
+                        this.setState({totalResult: this.state.totalResult + action, haveResult: false, haveOperator: false}, () => {
+                            this.updatePre();
+                        })
                     })
                 } else {
-                    this.setState({totalResult: this.state.totalResult + action, update: true, haveResult: false});
-                    this.componentDidMount();
+                    this.setState({totalResult: this.state.totalResult + action, haveResult: false, haveOperator: false}, () => {
+                        this.updatePre();
+                    });
                 }
                 break;
             default:
@@ -162,7 +161,6 @@ class Main extends Component {
         arr.splice(arr.length - 1, arr.length);
         this.setState({
             totalResult: arr.join(""),
-            update: false
         })
     }
 
